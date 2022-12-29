@@ -74,6 +74,17 @@ const Home = () => {
             </div>
           )}
         </div>
+        <div className="header-chrome-extension">
+              <h2>
+                Enjoy this tool? <a 
+                                    href="https://github.com/gwarren3210/gpt3-linkdin-writer-chrome-extension#readme"
+                                    className="link"
+                                  >
+                                    Here
+                                  </a>
+                's the chrome extension to use this tool directly on the LinkdIn website!
+              </h2>
+            </div>
       </div>
       <div className="badge-container grow">
         <a
