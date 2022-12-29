@@ -6,7 +6,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 const basePromptPrefix =
 `
-Generate 1 linkdin titles from the idea below.
+Generate 1 linkdin title from the idea below.
 
 Idea:
 `
@@ -23,10 +23,9 @@ const generateAction = async (req, res) => {
   
   const basePromptOutput = baseCompletion.data.choices.pop();
 
-  // I build Prompt #2.
   const secondPrompt = 
   `
-  Take the idea and titles and generate write a concise inspirational linkdin post in the style of Neil Patel and Gary Vaynerchuk. Make sure to include a personal anecdote and lessons learned from said story that relates to the title. The post should convey confidence and authenticity. Include trending hashtags in a new line at the end related to the content in the post.
+  Take the idea and titles and generate a concise inspirational linkdin post in the style of Neil Patel and Gary Vaynerchuk. Make sure to include a personal anecdote and lessons learned from said story that relates to the title. The post should convey confidence and authenticity.
 
 
   Idea: ${req.body.userInput}
@@ -35,20 +34,40 @@ const generateAction = async (req, res) => {
 
   LinkdIn Post:
   `
-  
-  // I call the OpenAI API a second time with Prompt #2
+
   const secondPromptCompletion = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt: `${secondPrompt}`,
-    temperature: 0.85,
-    max_tokens: 250,
+    temperature: 0.7,
+    max_tokens: 200,
   });
   
   // Get the output
   const secondPromptOutput = secondPromptCompletion.data.choices.pop();
+  
+  const thirdPrompt = 
+  `
+  Take the LinkdIn post below and generate 5 unordered trending hashtags related to the content in the post.
 
-  // Send over the Prompt #2's output to our UI instead of Prompt #1's.
-  res.status(200).json({ output: secondPromptOutput });
+  LinkdIn post: ${secondPromptCompletion.text}
+     
+  Hashtags:`
+
+  const thirdPromptCompletion = await openai.createCompletion({
+    model: 'text-davinci-003',
+    prompt: `${thirdPrompt}`,
+    temperature: 0.7,
+    max_tokens: 200,
+  });
+  
+  // Get the output
+  const thirdPromptOutput = thirdPromptCompletion.data.choices.pop();
+
+  const completedPrompt = `${secondPromptOutput.text}
+     
+  ${thirdPromptOutput.text}`
+  // Send over the Prompt #2's output to our UI.
+  res.status(200).json({ output: {text: completedPrompt} });
 };
 
 export default generateAction;
